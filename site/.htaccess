@@ -1,0 +1,18 @@
+
+# --- added by hardening pass ------------------------------------------------
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    # Don't advertise the PHP version.
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+</IfModule>
+
+# Backups, dumps and logs are never meant to be fetched. .bak in particular is
+# not executed by PHP, so a stray copy of a .php file is served as source.
+<FilesMatch "\.(?i:bak|old|orig|save|swp|sql|log|inc|md)$">
+    Require all denied
+</FilesMatch>
+# --- end hardening pass -----------------------------------------------------

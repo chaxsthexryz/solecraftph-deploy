@@ -1,0 +1,7 @@
+# Nothing under config/ is ever fetched over HTTP — these files are read from
+# disk by PHP's require_once, which this does not affect. Denying direct access
+# means a future misconfiguration that stops PHP executing serves a 403 rather
+# than the database password and the Firebase private key in plain text.
+<FilesMatch ".*">
+    Require all denied
+</FilesMatch>

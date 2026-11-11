@@ -1,0 +1,21 @@
+# uploads/ holds customer-visible product images and nothing else.
+#
+# Product image upload validates the extension and renames every file to
+# prod_<uniqid>.<ext>, so a .php cannot normally land here — but an uploads
+# directory that will execute PHP is one validation bug away from remote code
+# execution, and four stray copies of site pages were being served from here
+# and answering 200. Those are old versions of the app that will never receive
+# security fixes.
+#
+# Denying rather than deleting: the same outcome, no risk of removing the wrong
+# file, and it covers anything that appears here in future too.
+<FilesMatch "\.(?i:php|phtml|phps|phar|cgi|pl|py|sh|inc)$">
+    Require all denied
+</FilesMatch>
+
+# Images stay public and CORS-open, which the app needs for its product shots.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(?i:jpg|jpeg|png|gif|webp|svg)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+</IfModule>

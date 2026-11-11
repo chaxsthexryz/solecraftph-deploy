@@ -1,0 +1,4 @@
+site/config/mail.php
+site/config/paymongo_keys.php
+site/config/fcm.php
+*.sql

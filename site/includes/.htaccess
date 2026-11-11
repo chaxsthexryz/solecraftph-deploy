@@ -1,0 +1,6 @@
+# Nothing under includes/ is ever fetched over HTTP — every file here is
+# pulled in from disk by require_once. PHP executes them, so no source leaks
+# today, but a misconfiguration that stops PHP executing would serve the lot.
+<FilesMatch ".*">
+    Require all denied
+</FilesMatch>
