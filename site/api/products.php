@@ -52,7 +52,7 @@ function api_with_image_url(array $product): array
     // Which sizes can actually be bought. For a product not yet converted to
     // per-size stock this is every offered size while the product has stock, so
     // the app behaves exactly as before until the catalogue is counted.
-    $product['available_sizes'] = product_available_sizes((int) $product['id']);
+    $product['available_sizes'] = product_available_sizes((int) $product['id'], $product);
 
     // Every photo, absolute: the gallery on Shoe details swipes through these.
     $origin = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http')
@@ -97,6 +97,7 @@ if ($method === 'GET') {
     $subcategory = trim($_GET['subcategory'] ?? '');
 
     $products = $q !== '' ? product_search($q) : product_list($category ?: null, $subcategory ?: null);
+    product_sizes_preload();
     $products = api_with_ratings(array_map('api_with_image_url', $products));
     echo json_encode(['count' => count($products), 'products' => $products]);
     exit;

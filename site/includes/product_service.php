@@ -445,6 +445,10 @@ const PRODUCT_SIZES = ['7', '8', '9', '10', '11', '12'];
 /** ['7' => 3, '9' => 1, ...] for products that have per-size stock; [] if not. */
 function product_sizes_for(int $productId): array
 {
+    // After product_sizes_preload() (read-only list endpoints) no query per product.
+    if (isset($GLOBALS['__size_rows'])) {
+        return $GLOBALS['__size_rows'][$productId] ?? [];
+    }
     $stmt = db()->prepare('SELECT size, stock FROM product_sizes WHERE product_id = ?');
     $stmt->execute([$productId]);
     $out = [];
@@ -452,6 +456,15 @@ function product_sizes_for(int $productId): array
         $out[(string) $row['size']] = (int) $row['stock'];
     }
     return $out;
+}
+
+/** One query for every product's size stock; the database is remote, so asking per product costs seconds. */
+function product_sizes_preload(): void
+{
+    $GLOBALS['__size_rows'] = [];
+    foreach (db()->query('SELECT product_id, size, stock FROM product_sizes')->fetchAll() as $r) {
+        $GLOBALS['__size_rows'][(int) $r['product_id']][(string) $r['size']] = (int) $r['stock'];
+    }
 }
 
 /** Whether this product is managed per size at all. */
@@ -479,13 +492,13 @@ function product_stock_for_size(int $productId, string $size): int
 }
 
 /** Which sizes a shopper can actually buy right now. */
-function product_available_sizes(int $productId): array
+function product_available_sizes(int $productId, ?array $product = null): array
 {
     $sizes = product_sizes_for($productId);
     if (!$sizes) {
         // Not tracked per size: every offered size is available while the
         // product itself has stock.
-        $p = product_find($productId);
+        $p = $product ?? product_find($productId);
         return ($p && (int) $p['stock'] > 0) ? PRODUCT_SIZES : [];
     }
     return array_values(array_filter(
