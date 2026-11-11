@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="wrap foot__bottom" style="padding-left:0;padding-right:0;">
-      <span>&copy; <?= date('Y') ?> SoleCraftPH. All rights reserved.</span>
+      <span>&copy; <?= date('Y') ?> SoleCraftPH, a school project. Not a real store. Brand names, logos and product images belong to their respective owners and are used for educational purposes only.</span>
       <span class="mono">Made in the Philippines</span>
     </div>
   </div>
